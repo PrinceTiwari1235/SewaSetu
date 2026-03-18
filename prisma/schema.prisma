@@ -1,0 +1,190 @@
+// This is your Prisma schema file.
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(USER)
+  language      Language  @default(EN)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts   Account[]
+  sessions   Session[]
+  bookmarks  Bookmark[]
+  activities Activity[]
+  reminders  Reminder[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Language {
+  EN
+  NP
+}
+
+// ─── NextAuth tables ──────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── Portals ──────────────────────────────────────────────────────────────────
+
+model Portal {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  url         String
+  category    String
+  description String   @db.Text
+  icon        String
+  tags        String[] // stored as array
+  featured    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  lastVerified DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  guide      Guide?
+  bookmarks  Bookmark[]
+  activities Activity[]
+
+  @@map("portals")
+}
+
+// ─── Guides (step-by-step instructions per portal) ───────────────────────────
+
+model Guide {
+  id          String   @id @default(cuid())
+  portalId    String   @unique
+  title       String
+  titleNp     String?  // Nepali translation
+  intro       String   @db.Text
+  introNp     String?  @db.Text
+  steps       Json     // array of { title, titleNp, content, contentNp }
+  documents   Json     // array of { name, nameNp, required: bool, note }
+  fees        String?
+  processingTime String?
+  tips        String[] // array of tip strings
+  updatedAt   DateTime @updatedAt
+
+  portal Portal @relation(fields: [portalId], references: [id], onDelete: Cascade)
+
+  @@map("guides")
+}
+
+// ─── User Bookmarks ───────────────────────────────────────────────────────────
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  portalId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portal Portal @relation(fields: [portalId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, portalId])
+  @@map("bookmarks")
+}
+
+// ─── Activity Log ─────────────────────────────────────────────────────────────
+
+model Activity {
+  id        String       @id @default(cuid())
+  userId    String
+  portalId  String?
+  type      ActivityType
+  meta      Json?        // e.g. { query: "passport" } for search events
+  createdAt DateTime     @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portal Portal? @relation(fields: [portalId], references: [id], onDelete: SetNull)
+
+  @@map("activities")
+}
+
+enum ActivityType {
+  VIEW_PORTAL
+  SEARCH
+  BOOKMARK_ADD
+  BOOKMARK_REMOVE
+  OPEN_EXTERNAL
+}
+
+// ─── Reminders ────────────────────────────────────────────────────────────────
+
+model Reminder {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  note      String?
+  dueDate   DateTime
+  recurring Boolean  @default(false)
+  sent      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reminders")
+}
