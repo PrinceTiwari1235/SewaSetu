@@ -4,16 +4,68 @@ import Providers from "@/components/Providers";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "SewaSetu — Nepal Government Services Portal",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://sewasetu.com",
+  ),
+  title: {
+    default: "SewaSetu — Nepal Government Services Portal",
+    template: "%s | SewaSetu",
+  },
   description:
-    "Access all Nepal government forms and services from one place. Simplified e-governance for every Nepali citizen.",
-  keywords:
-    "Nepal government forms, Lok Sewa, passport, NID, driving license, tax, PSC, nepal eservices",
+    "SewaSetu helps people in Nepal access government forms, applications, and public service portals in one easy place.",
+  applicationName: "SewaSetu",
+  keywords: [
+    "Sewasetu",
+    "SewaSetu",
+    "gov",
+    "government",
+    "forms",
+    "application",
+    "nepal",
+    "easy form",
+    "nepal government forms",
+    "nepal online application",
+    "e-governance nepal",
+    "lok sewa",
+    "driving license nepal",
+    "passport nepal",
+    "nid nepal",
+    "tax forms nepal",
+    "citizen services nepal",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  authors: [{ name: "SewaSetu Team" }],
+  creator: "SewaSetu",
+  publisher: "SewaSetu",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     title: "SewaSetu | सेवासेतु",
-    description: "Nepal's unified government services portal",
+    description:
+      "Find Nepal government forms and online application guidance quickly with SewaSetu.",
+    url: "/",
+    siteName: "SewaSetu",
+    type: "website",
     locale: "en_NP",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "SewaSetu — Nepal Government Services Portal",
+    description:
+      "Easy access to Nepal government forms and applications in one place.",
+  },
+  category: "government",
 };
 
 export default function RootLayout({
