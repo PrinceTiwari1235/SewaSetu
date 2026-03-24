@@ -8,12 +8,12 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL || "https://sewasetu.com",
   ),
   title: {
-    default: "SewaSetu — Nepal Government Services Portal",
-    template: "%s | SewaSetu",
+    default: "Sewa Setu - Nepal",
+    template: "%s | Sewa Setu - Nepal",
   },
   description:
     "SewaSetu helps people in Nepal access government forms, applications, and public service portals in one easy place.",
-  applicationName: "SewaSetu",
+  applicationName: "Sewa Setu - Nepal",
   keywords: [
     "Sewasetu",
     "SewaSetu",
@@ -36,9 +36,18 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/logo-sewa-setu.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/logo-sewa-setu.svg",
+    apple: "/logo-sewa-setu.svg",
+  },
   authors: [{ name: "SewaSetu Team" }],
-  creator: "SewaSetu",
-  publisher: "SewaSetu",
+  creator: "Sewa Setu - Nepal",
+  publisher: "Sewa Setu - Nepal",
   robots: {
     index: true,
     follow: true,
@@ -51,21 +60,41 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "SewaSetu | सेवासेतु",
+    title: "Sewa Setu - Nepal",
     description:
       "Find Nepal government forms and online application guidance quickly with SewaSetu.",
     url: "/",
-    siteName: "SewaSetu",
+    siteName: "Sewa Setu - Nepal",
     type: "website",
     locale: "en_NP",
+    images: [
+      {
+        url: "/logo-sewa-setu.svg",
+        width: 512,
+        height: 512,
+        alt: "Sewa Setu - Nepal logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SewaSetu — Nepal Government Services Portal",
+    title: "Sewa Setu - Nepal",
     description:
       "Easy access to Nepal government forms and applications in one place.",
+    images: ["/logo-sewa-setu.svg"],
   },
   category: "government",
+};
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sewasetu.com";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Sewa Setu - Nepal",
+  alternateName: "SewaSetu",
+  url: siteUrl,
+  logo: `${siteUrl}/logo-sewa-setu.svg`,
 };
 
 export default function RootLayout({
@@ -76,6 +105,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="noise">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
